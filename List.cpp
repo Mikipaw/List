@@ -2,8 +2,8 @@
 // Created by mikipaw on 03.11.2020.
 //
 
+#include <cmath>
 #include "List.h"
-
 
 
 int List::Insert(int pos, double value) {
@@ -11,7 +11,17 @@ int List::Insert(int pos, double value) {
 
     if(size == capacity) Expand();
 
-    size_t new_pos = FindFree(pos);
+    //size_t new_pos = FindFree(pos);
+    size_t new_pos = bhead;
+    bhead = data[new_pos].next;
+
+    if(size == 0) {
+        data[new_pos].prev = 0;
+        data[new_pos].next = -1;
+        data[0].next = new_pos;
+        size++;
+        return new_pos;
+    }
 
     data[new_pos].next = data[pos].next;
     data[data[pos].next].prev = new_pos;
@@ -20,13 +30,10 @@ int List::Insert(int pos, double value) {
 
     data[new_pos].item = value;
 
-    if(size == 0) {
-        data[new_pos].prev = 0;
-        data[new_pos].next = -1;
-        data[0].next = new_pos;
-    }
-
     size++;
+
+    if(data[new_pos].prev == 0)  head = new_pos;
+    if(data[new_pos].next == -1) tail = new_pos;
 
     return new_pos;
 }
@@ -36,18 +43,19 @@ void List::Expand(bool* success) {
     *success = true;
     if(capacity < 16) {
         capacity = 16;
-        data = (List_elem*) realloc(data, capacity*sizeof(List_elem));
+        data = (List_elem*) realloc(data, (1 + capacity) * sizeof(List_elem));
         if (data == nullptr) *success = false;
         Fill_new_elems();
         return;
     }
     else {
         capacity*=2;
-        data = (List_elem*) realloc(data, capacity*sizeof(List_elem));
+        data = (List_elem*) realloc(data, capacity * sizeof(List_elem));
         Fill_new_elems();
     }
 
 }
+
 
 size_t List::FindFree(int pos) const {
     while (data[pos].prev != -1) pos++;
@@ -86,7 +94,7 @@ void List::Dump() const {
             fprintf(GraphViz, "node%d:f2 -> node%d:f1;\n", i, data[i].next);
             fprintf(GraphViz, "node%d:f0 -> node%d:f1;\n", data[i].next, i);
         }
-        else fprintf(GraphViz, "node%d:f2 -> nodeend;\n", i);
+        else if(data[i].prev != -1) fprintf(GraphViz, "node%d:f2 -> nodeend;\n", i);
     }
     fprintf(GraphViz, "node%d -> node%d:f1;\n", 0, data[0].next);
 
@@ -96,20 +104,33 @@ void List::Dump() const {
 
 int List::Delete_elem(int pos) {
     if (pos >= capacity) return OUT_OF_RANGE;
-    if (data[pos].next == -1 && data[pos].prev == -1) return UNAVAILABLE_ELEMENT;
+    if (data[pos].prev == -1) return UNAVAILABLE_ELEMENT;
 
     data[data[pos].prev].next = data[pos].next;
     data[data[pos].next].prev = data[pos].prev;
-    data[pos].next = -1;
+
+    data[pos].next = bhead;
+    bhead = pos;
     data[pos].prev = -1;
+
+    data[pos].item = NAN;
 
     return ALL_OK;
 }
 
 void List::Fill_new_elems() {
-    for(size_t i = size + 1; i < capacity; ++i) {
-        data[i].next = -1;
-        data[i].prev = -1;
-        data[i].item = -0;
-    }
+    for(size_t i = size + 1; i <= capacity; ++i) {
+        data[i].next =  i + 1;
+        }
 }
+
+int List::List_OK() {
+    size_t curr_element = 0;
+    for(curr_element = head; curr_element != tail; curr_element = data[curr_element].next) {
+        if(data[data[curr_element].next].prev != curr_element) return INVALID_GRAPH;
+    }
+
+    return ALL_OK;
+}
+
+

@@ -19,9 +19,9 @@
  * @param item a double - element in list.
  */
 struct List_elem {
-    int     next = 0;
-    int     prev = 0;
-    double  item = 0;
+    int     next =  0;
+    int     prev = -1;
+    double  item =  0;
 };
 
 /*!
@@ -38,11 +38,11 @@ class List{
 
 private:
     List_elem* data = nullptr;
-    List_elem* head = data;
-    List_elem* tail = data;
-    size_t  size     = 0;
-    size_t  capacity = 0;
-
+    size_t  head        = 0;
+    size_t  tail        = 0;
+    size_t  size        = 0;
+    size_t  capacity    = 0;
+    size_t  bhead       = 1;
 
 public:
 
@@ -80,25 +80,53 @@ public:
     int Delete_elem(int pos);
 
     /*!
-     * @method Dump();
+     * @method Dump() const;
      * @brief The method prints information about the list.
      * @return nothing?
      */
     void Dump() const;
 
-
+    List& operator=(const List& list)   = delete;
+    List           (const List&)        = delete;
 
     ~List(){
-        delete [] data;
+        delete[] data;
     }
 
+    [[nodiscard]] size_t Get_tail() const { return tail; }
+    [[nodiscard]] size_t Get_head() const { return head; }
+
 private:
+    /*!
+     * @method Expand(bool* succes = nullptr);
+     * @brief The method expands the list.
+     * @param success - success of the operation.
+     * @return nothing.
+     */
     void Expand(bool* success = nullptr);
 
+    /*!
+     * @method Fill_new_elems();
+     * @brief The method fills the list by empty elements.
+     * @return nothing.
+     */
     void Fill_new_elems();
 
+    /*!
+     * @method Find_Free(int pos) const;
+     * @brief The method finds free place for inserting element.
+     * @param pos an integer.
+     * @complexity O(N).
+     * @return size_t - position found.
+     */
     size_t FindFree(int pos) const;
 
+    /*!
+     * @method List_OK();
+     * @brief Classic verifier for the list.
+     * @return ERROR CODE.
+     */
+    int List_OK();
 };
 
 

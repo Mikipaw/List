@@ -9,6 +9,7 @@ enum ERROR_CODES{
     ALL_OK,
     OUT_OF_RANGE,
     UNAVAILABLE_ELEMENT,
+    INVALID_GRAPH,
 };
 
 

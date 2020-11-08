@@ -19,9 +19,10 @@
  * @param item a double - element in list.
  */
 struct List_elem {
-    int     next =  0;
+    int     next = -1;
     int     prev = -1;
     double  item =  0;
+    bool    free = true;
 };
 
 /*!

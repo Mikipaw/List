@@ -16,6 +16,8 @@ int List::Insert(int pos, double value) {
         data[0].next = new_pos;
         data[new_pos].item = value;
         size++;
+        data[0].free = false;
+        data[1].free = false;
         return new_pos;
     }
 
@@ -90,6 +92,8 @@ void List::Dump() const {
         if(i % 2 == 0) color = "gold";
         else color = "grey";
         fprintf(Graph, "node%d[ style = \"filled\", fillcolor = \"%s\"];\n", i, color);
+        data[capacity].item = 0;
+        data[capacity].prev = -1;
         fprintf(Graph,
                 "node%d [label=\"<f0> prev (%d)|<f1> num (%d)|<f2> next (%d)|<f3> data (%lf)\"];\n",
                 i, data[i].prev, i, data[i].next, data[i].item);
@@ -141,3 +145,5 @@ int List::List_OK() {
 
     return ALL_OK;
 }
+
+
